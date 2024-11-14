@@ -6,6 +6,18 @@ import routes from './routes/index.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+connection.once('open', async () => {
+  await server.start();
+});
+
+
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
