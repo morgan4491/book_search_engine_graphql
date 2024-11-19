@@ -1,6 +1,6 @@
 import { getUserId } from "../../services/auth.js";
 import User from "../../models/User.js";
-import { getErrorMessage } from "../../controllers/helpers/index.js";
+import { getErrorMessage } from "../../controllers/index.js";
 import { GraphQLError } from 'graphql';
 const user_resolvers = {
     Query: {

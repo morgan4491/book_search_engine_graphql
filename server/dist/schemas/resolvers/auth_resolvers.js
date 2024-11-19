@@ -1,6 +1,6 @@
-import { getErrorMessage } from "../../controllers/helpers";
-import User from "../../models/User";
-import { signToken } from "../../services/auth";
+import { getErrorMessage } from "../../controllers/index.js";
+import User from "../../models/User.js";
+import { signToken } from "../../services/auth.js";
 import { GraphQLError } from 'graphql';
 const auth_resolvers = {
     Query: {

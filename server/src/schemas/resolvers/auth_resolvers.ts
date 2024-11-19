@@ -1,11 +1,11 @@
-import { getErrorMessage } from "../../controllers/helpers";
-import User from "../../models/User";
-import { signToken } from "../../services/auth";
+import { getErrorMessage } from "../../controllers/index.js";
+import User from "../../models/User.js";
+import { signToken } from "../../services/auth.js";
 import { Types } from "mongoose";
 import { GraphQLError } from 'graphql';
 
 
-import Context from "../../interfaces/Context";
+import Context from "../../interfaces/Context.js";
 
 
 const auth_resolvers = {
