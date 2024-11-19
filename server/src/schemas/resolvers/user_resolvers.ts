@@ -1,12 +1,15 @@
 import { getUserId } from "../../services/auth.js";
 import User from "../../models/User.js";
 import { getErrorMessage } from "../../controllers/helpers/index.js";
+import Context from "../../interfaces/Context.js";
+
+import { GraphQLError } from 'graphql';
 
 const user_resolvers = {
   Query: {
     // Get User Books
-    async getUserBooks(req: any) {
-      const user_id = getUserId(req);
+    async getUserBooks(_: any, __: any, context: Context) {
+      const user_id = getUserId(context.res.user._id);
 
       // If the client didn't send a cookie, we just send back an empty array
       if (!user_id) {
@@ -21,11 +24,11 @@ const user_resolvers = {
   },
 
   Mutation: {
-    async saveBook(req: any) {
+    async saveBook(_: any, __: any, context: Context) {
       try {
         await User.findOneAndUpdate(
-          { _id: req.user_id },
-          { $addToSet: { savedBooks: req.body } },
+          { _id: context.req.user_id },
+          { $addToSet: { savedBooks: context.req.body } },
           { new: true, runValidators: true }
         );
 
@@ -38,23 +41,19 @@ const user_resolvers = {
 
         const errorMessage = getErrorMessage(error);
 
-        return {
-          message: errorMessage
-        };
+        throw new GraphQLError(errorMessage);
       }
     },
 
-    async deleteBook (req: any) {
+    async deleteBook (_: any, __: any, context: Context) {
       const updatedUser = await User.findOneAndUpdate(
-        { _id: req.user_id },
-        { $pull: { savedBooks: { googleBookId: req.params.bookId } } },
+        { _id: context.req.user_id },
+        { $pull: { savedBooks: { googleBookId: context.req.params.bookId } } },
         { new: true }
       );
     
       if (!updatedUser) {
-        return {
-          message: "Couldn't find user with this id!"
-        };
+        throw new GraphQLError("Couldn't find user with this id!");
       }
     
       // Return generic response - This is NOT used on the client-side, but we must return a response

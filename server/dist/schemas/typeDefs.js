@@ -1,6 +1,5 @@
 const gql = String.raw;
-
-const typeDefs = gql`
+const typeDefs = gql `
     type Book {
         googleBookId: ID
         authors: [String]
@@ -42,5 +41,4 @@ const typeDefs = gql`
         deleteBook(googleBookId: String): Response
     }
 `;
-
 export default typeDefs;

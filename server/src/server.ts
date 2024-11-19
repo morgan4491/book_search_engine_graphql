@@ -4,6 +4,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import path from 'node:path';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import { authenticate } from './services/auth.js';
 
 dotenv.config();
 
@@ -44,7 +45,9 @@ db.once('open', async () => {
     express.urlencoded({ extended: true }),
     express.json(),
     cookieParser(),
-    expressMiddleware(server)
+    expressMiddleware(server, {
+      context: authenticate as any
+    })
   );
 
   app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
