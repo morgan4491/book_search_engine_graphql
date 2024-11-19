@@ -8,7 +8,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import db from './config/connection.js';
-import routes from './routes/index.js';
 import typeDefs from './schemas/typeDefs.js';
 import resolvers from './schemas/resolvers.js';
 
@@ -20,12 +19,12 @@ const server = new ApolloServer({
   resolvers,
 });
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-// Give routes access to req.cookies
-app.use(cookieParser());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// // Give routes access to req.cookies
+// app.use(cookieParser());
 
-app.use(routes);
+// app.use(routes);
 
 // if we're in production, serve client/build as static assets and ensure the index.html file is served for the React Router to handle UI views
 if (process.env.PORT) {
@@ -37,6 +36,16 @@ if (process.env.PORT) {
   })
 }
 
-db.once('open', () => {
+db.once('open', async () => {
+  await server.start();
+
+  app.use(
+    '/graphql',
+    express.urlencoded({ extended: true }),
+    express.json(),
+    cookieParser(),
+    expressMiddleware(server)
+  );
+
   app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
 });
