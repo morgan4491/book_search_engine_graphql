@@ -1,4 +1,6 @@
 import express from 'express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
 import path from 'node:path';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -7,9 +9,16 @@ dotenv.config();
 
 import db from './config/connection.js';
 import routes from './routes/index.js';
+import typeDefs from './schemas/typeDefs.js';
+import resolvers from './schemas/resolvers.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request } from 'express';
 import {Types} from 'mongoose';
 import jwt from 'jsonwebtoken';
 
@@ -43,21 +43,15 @@ export const signToken = (user_id: Types.ObjectId) => {
 /* 
   Route middleware function that blocks an unauthenticated user from triggering a route and attaches the user_id to the req object
 */
-export const blockGuest = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async ({ req }: { req: Request }) => {
   // Get the user's id from the request cookie
   const user_id = getUserId(req);
 
   // If they don't have a cookie or valid JWT, they are not authorized
   if (!user_id) {
-    res.status(401).json({
-      message: 'You are not authorized to perform that action'
-    });
-    return;
+    throw new Error('You are not authorized to perform that action');
   }
 
-  // Attach the user's id to the request 
-  req.user_id = user_id;
-
-  // Call the next route callback function
-  next();
+  // Return an object with the user's id
+  return { user_id };
 };
