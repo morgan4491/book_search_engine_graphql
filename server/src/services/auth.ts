@@ -1,6 +1,7 @@
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import {Types} from 'mongoose';
 import jwt from 'jsonwebtoken';
+
 
 const { sign, verify } = jwt;
 

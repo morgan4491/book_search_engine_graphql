@@ -13,7 +13,7 @@ const auth_resolvers = {
         async getUser(_: any, __: any, context: Context) {
             // Retrieves the user_id from the request object - Check out services/auth.ts->getUserId
 
-            const user_id = context.user_id;
+            const user_id = context.req.user_id;
 
             if (!user_id) {
                 return {
