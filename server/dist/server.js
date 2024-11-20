@@ -33,5 +33,7 @@ db.once('open', async () => {
     app.use('/graphql', express.urlencoded({ extended: true }), express.json(), cookieParser(), expressMiddleware(server, {
         context: authenticate
     }));
-    app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
+    app.listen(PORT, () => {
+        console.log(`🌍 Now listening on localhost:${PORT}`);
+    });
 });

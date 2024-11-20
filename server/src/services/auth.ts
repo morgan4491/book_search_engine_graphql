@@ -12,7 +12,7 @@ interface JwtPayload {
   Function that pulls the token cookie from the client request and returns the user's id
   We seperate this function so we can use it for route callbacks or basic controller implentation (ie. getUser in auth_controller)
 */
-export const getUserId = (req: Request) => {
+export const getUserId = (req: any) => {
   const token = req.cookies?.book_app_token;
 
   if (!token) return false;

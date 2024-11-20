@@ -1,11 +1,38 @@
-import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import App from './App.js'
-import SearchBooks from './pages/SearchBooks.js'
-import SavedBooks from './pages/SavedBooks.js'
-import { StoreProvider } from './store/index.js'
+import SearchBooks from './pages/SearchBooks.tsx';
+import SavedBooks from './pages/SavedBooks.tsx';
+import { StoreProvider } from './store/index.tsx';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import App from './App.tsx';
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => console.log(
+      `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+    )
+    );
+  }
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`);
+    
+  }
+});
+
+const link = from([
+  errorLink,
+  new HttpLink({ uri: '/graphql' })
+]);
+
+export const client = new ApolloClient({
+  link,
+  cache: new InMemoryCache
+});
 
 const router = createBrowserRouter([
   {
