@@ -1,4 +1,4 @@
-import { getUserId } from "../../services/auth.js";
+// import { getUserId } from "../../services/auth.js";
 import User from "../../models/User.js";
 import { getErrorMessage } from "../../controllers/index.js";
 import Context from "../../interfaces/Context.js";
@@ -9,7 +9,7 @@ const user_resolvers = {
   Query: {
     // Get User Books
     async getUserBooks(_: any, __: any, context: Context) {
-      const user_id = getUserId(context.res.user._id);
+      const user_id = context.req.user_id
 
       // If the client didn't send a cookie, we just send back an empty array
       if (!user_id) {
@@ -24,11 +24,18 @@ const user_resolvers = {
   },
 
   Mutation: {
-    async saveBook(_: any, __: any, context: Context) {
+    async saveBook(_: any, args: any, context: Context) {
+
+      if (!context.req.user_id) {
+        return {
+          errors: ['You are not authorized to perform this action']
+        }
+      }
+
       try {
         await User.findOneAndUpdate(
           { _id: context.req.user_id },
-          { $addToSet: { savedBooks: context.req.body } },
+          { $addToSet: { savedBooks: args } },
           { new: true, runValidators: true }
         );
 

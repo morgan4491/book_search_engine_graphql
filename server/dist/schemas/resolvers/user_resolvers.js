@@ -1,4 +1,4 @@
-import { getUserId } from "../../services/auth.js";
+// import { getUserId } from "../../services/auth.js";
 import User from "../../models/User.js";
 import { getErrorMessage } from "../../controllers/index.js";
 import { GraphQLError } from 'graphql';
@@ -6,7 +6,7 @@ const user_resolvers = {
     Query: {
         // Get User Books
         async getUserBooks(_, __, context) {
-            const user_id = getUserId(context.res.user._id);
+            const user_id = context.req.user_id;
             // If the client didn't send a cookie, we just send back an empty array
             if (!user_id) {
                 return [];
@@ -17,9 +17,14 @@ const user_resolvers = {
         },
     },
     Mutation: {
-        async saveBook(_, __, context) {
+        async saveBook(_, args, context) {
+            if (!context.req.user_id) {
+                return {
+                    errors: ['You are not authorized to perform this action']
+                };
+            }
             try {
-                await User.findOneAndUpdate({ _id: context.req.user_id }, { $addToSet: { savedBooks: context.req.body } }, { new: true, runValidators: true });
+                await User.findOneAndUpdate({ _id: context.req.user_id }, { $addToSet: { savedBooks: args } }, { new: true, runValidators: true });
                 // Return generic response - This is NOT used on the client-side, but we must return a response
                 return {
                     message: 'Book saved successfully!'

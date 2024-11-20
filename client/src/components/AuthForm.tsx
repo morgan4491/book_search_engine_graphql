@@ -3,9 +3,11 @@ import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
 
-import { loginUser, registerUser } from '../utils/API';
+// import { loginUser, registerUser } from '../utils/API';
 import { useStore } from '../store';
+import { LOGIN_USER, REGISTER_USER } from '../graphql/mutations';
 
 const initialFormData = {
   username: '',
@@ -17,6 +19,8 @@ const initialFormData = {
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const AuthForm = ({ isLogin, handleModalClose }: { handleModalClose: () => void; isLogin: boolean;}) => {
   const [formData, setFormData] = useState(initialFormData);
+  const [registerUser] = useMutation(REGISTER_USER);
+  const [loginUser] = useMutation(LOGIN_USER);
   const [showAlert, setShowAlert] = useState(false);
   const {setState} = useStore()!;
   const navigate = useNavigate();
@@ -31,12 +35,15 @@ const AuthForm = ({ isLogin, handleModalClose }: { handleModalClose: () => void;
 
     try {
       const authFunction = isLogin ? loginUser : registerUser;
+      const prop = isLogin ? 'loginUser' : 'registerUser';
 
-      const res = await authFunction(formData);
+      const res = await authFunction({
+        variables: formData
+      });
       
       setState((oldState) => ({
         ...oldState,
-        user: res.data.user
+        user: res.data[prop].user
       }));
 
       setFormData({...initialFormData});

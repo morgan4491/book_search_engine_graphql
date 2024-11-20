@@ -1,17 +1,28 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Modal, Tab } from 'react-bootstrap';
+import { useMutation } from '@apollo/client';
 import AuthForm from './AuthForm';
 import { useStore } from '../store';
-import { logoutUser } from '../utils/API';
+// import { logoutUser } from '../utils/API';
+import { LOGOUT_USER } from '../graphql/mutations';
+import { client } from '../main';
+
 
 const AppNavbar = () => {
   // set modal display state
   const [showModal, setShowModal] = useState(false);
-  const {state, setState} = useStore()!;
+  const { state, setState } = useStore()!;
   const navigate = useNavigate();
+  const [logoutUser] = useMutation(LOGOUT_USER, {
+    onCompleted() {
+      client.clearStore();
+    }
+  })
 
-  const handleLogout = async () => {
+  const handleLogout = async (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    event.preventDefault();
+
     await logoutUser();
 
     setState((oldState) => ({
@@ -31,21 +42,21 @@ const AppNavbar = () => {
           </Navbar.Brand>
           {!state.loading && (
             <Nav className='ml-auto d-flex'>
-                <Nav.Link as={NavLink} to='/'>
-                  Search For Books
-                </Nav.Link>
-                {/* if user is logged in show saved books and logout */}
-                {state.user ? (
-                  <>
-                    <Nav.Link as={NavLink} to='/saved'>
-                      See Your Books
-                    </Nav.Link>
+              <Nav.Link as={NavLink} to='/'>
+                Search For Books
+              </Nav.Link>
+              {/* if user is logged in show saved books and logout */}
+              {state.user ? (
+                <>
+                  <Nav.Link as={NavLink} to='/saved'>
+                    See Your Books
+                  </Nav.Link>
                   <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-                  </>
-                ) : (
-                  <Nav.Link onClick={() => setShowModal(true)}>Login/Sign Up</Nav.Link>
-                )}
-              </Nav>
+                </>
+              ) : (
+                <Nav.Link onClick={() => setShowModal(true)}>Login/Sign Up</Nav.Link>
+              )}
+            </Nav>
           )}
         </Container>
       </Navbar>

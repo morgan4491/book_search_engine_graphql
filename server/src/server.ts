@@ -46,7 +46,7 @@ db.once('open', async () => {
     express.json(),
     cookieParser(),
     expressMiddleware(server, {
-      context: authenticate as any
+      context: authenticate
     })
   );
 
