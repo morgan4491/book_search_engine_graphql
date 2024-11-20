@@ -3,7 +3,7 @@ import {createRoot} from 'react-dom/client';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { StoreProvider } from './store/index.tsx';
-import { BrowserRouter} from 'react-router-dom';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
 
 // import SearchBooks from './pages/SearchBooks.tsx';
 // import SavedBooks from './pages/SavedBooks.tsx';
@@ -11,6 +11,8 @@ import { BrowserRouter} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import App from './App.tsx';
+import SearchBooks from './pages/SearchBooks.tsx';
+import SavedBooks from './pages/SavedBooks.tsx';
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -76,7 +78,12 @@ createRoot(document.getElementById('root')!).render(
     <ApolloProvider client={client}>
       <StoreProvider>
         <BrowserRouter>
-          <App />
+          <Routes>
+            <Route path="/" element={<App />}>
+              <Route index element={<SearchBooks />}/>
+              <Route path="saved" element={<SavedBooks />}/>
+            </Route>
+          </Routes>
         </BrowserRouter>
       </StoreProvider>
     </ApolloProvider>

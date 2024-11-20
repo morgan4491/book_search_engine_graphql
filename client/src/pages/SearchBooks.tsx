@@ -10,7 +10,9 @@ import {
 } from 'react-bootstrap';
 import { useQuery, useMutation } from '@apollo/client';
 
-import { getUserBooks, saveBook, searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
+import { GET_USER_BOOKS } from '../graphql/queries';
+import { SAVE_BOOK } from '../graphql/mutations';
 import { Book, GoogleAPIBook } from '../interfaces/index.d';
 import { useStore } from '../store';
 
@@ -24,19 +26,19 @@ const SearchBooks = () => {
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState<string[]>([]);
 
+  const { data, loading } = useQuery(GET_USER_BOOKS);
+
+  const [saveBook] = useMutation(SAVE_BOOK);
+
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
   useEffect(() => {
-    if (!state.loading && state.user) {
-      getUserBooks()
-        .then((res) => {
-          // Store just the googleBookId's from the user's books to the savedBooks array
-          setSavedBookIds([
-            ...res.data.map((book: Book) => book.googleBookId)
-          ]);
-        });
+    if (!loading && data) {
+      setSavedBookIds([
+        ...data.getUserBooks.map((book: Book) => book.googleBookId)
+      ]);
     }
-  });
+  }, [data, loading]);
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -49,7 +51,9 @@ const SearchBooks = () => {
     try {
       const res = await searchGoogleBooks(searchInput);
 
-      const bookData = res.data.items.map((book: GoogleAPIBook) => ({
+      const { items } = res.data;
+
+      const bookData = items.map((book: GoogleAPIBook) => ({
         googleBookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
@@ -67,10 +71,14 @@ const SearchBooks = () => {
   // create function to handle saving a book to our database
   const handleSaveBook = async (book: Book) => {
     try {
-      await saveBook(book);
+      const { data } = await saveBook({
+        variables: {
+          book
+        }
+      });
 
       // if book successfully saves to user's account, save book id to state
-      setSavedBookIds([...savedBookIds, book.googleBookId]);
+      setSavedBookIds([...savedBookIds, data.saveBook.googleBookId]);
     } catch (err) {
       console.error(err);
     }
