@@ -28,18 +28,10 @@ const server = new ApolloServer({
 // app.use(routes);
 
 // if we're in production, serve client/build as static assets and ensure the index.html file is served for the React Router to handle UI views
-if (process.env.PORT) {
-  const __dirname = path.dirname(new URL(import.meta.url).pathname);
-  
-  app.use(express.static(path.join(__dirname, '../../client/dist')));
-  app.get('*', (_, res) => {
-    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
-  })
-}
 
 db.once('open', async () => {
   await server.start();
-
+  
   app.use(
     '/graphql',
     express.urlencoded({ extended: true }),
@@ -49,7 +41,15 @@ db.once('open', async () => {
       context: authenticate
     })
   );
-
+  
+  if (process.env.PORT) {
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
+    
+    app.use(express.static(path.join(__dirname, '../../client/dist')));
+    app.get('*', (_, res) => {
+      res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+    })
+  }
   app.listen(PORT, () => {
     console.log(`🌍 Now listening on localhost:${PORT}`);
   });
