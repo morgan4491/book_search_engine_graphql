@@ -27,7 +27,7 @@ const SavedBooks = () => {
     try {
       await deleteBook({
         variables: {
-          bookId
+          googleBookId: bookId
         }
       });
 

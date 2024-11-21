@@ -45,7 +45,7 @@ export const SAVE_BOOK = gql`
 `;
 
 export const DELETE_BOOK = gql`
-    mutation DeleteBook($googleBookId: String) {
+    mutation DeleteBook($googleBookId: ID) {
         deleteBook(googleBookId: $googleBookId) {
             message
         }

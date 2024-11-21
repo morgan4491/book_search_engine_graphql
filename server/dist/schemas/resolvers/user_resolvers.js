@@ -24,7 +24,7 @@ const user_resolvers = {
                 };
             }
             try {
-                await User.findOneAndUpdate({ _id: context.req.user_id }, { $addToSet: { savedBooks: args } }, { new: true, runValidators: true });
+                await User.findOneAndUpdate({ _id: context.req.user_id }, { $addToSet: { savedBooks: args.book } }, { new: true, runValidators: true });
                 // Return generic response - This is NOT used on the client-side, but we must return a response
                 return {
                     message: 'Book saved successfully!'
@@ -36,8 +36,8 @@ const user_resolvers = {
                 throw new GraphQLError(errorMessage);
             }
         },
-        async deleteBook(_, __, context) {
-            const updatedUser = await User.findOneAndUpdate({ _id: context.req.user_id }, { $pull: { savedBooks: { googleBookId: context.req.params.bookId } } }, { new: true });
+        async deleteBook(_, args, context) {
+            const updatedUser = await User.findOneAndUpdate({ _id: context.req.user_id }, { $pull: { savedBooks: { googleBookId: args.googleBookId } } }, { new: true });
             if (!updatedUser) {
                 throw new GraphQLError("Couldn't find user with this id!");
             }

@@ -25,6 +25,7 @@ const user_resolvers = {
 
   Mutation: {
     async saveBook(_: any, args: any, context: Context) {
+      
 
       if (!context.req.user_id) {
         return {
@@ -35,7 +36,7 @@ const user_resolvers = {
       try {
         await User.findOneAndUpdate(
           { _id: context.req.user_id },
-          { $addToSet: { savedBooks: args } },
+          { $addToSet: { savedBooks: args.book } },
           { new: true, runValidators: true }
         );
 
@@ -52,10 +53,12 @@ const user_resolvers = {
       }
     },
 
-    async deleteBook (_: any, __: any, context: Context) {
+    async deleteBook (_: any, args: any, context: Context) {
+
+      
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.req.user_id },
-        { $pull: { savedBooks: { googleBookId: context.req.params.bookId } } },
+        { $pull: { savedBooks: { googleBookId: args.googleBookId } } },
         { new: true }
       );
     

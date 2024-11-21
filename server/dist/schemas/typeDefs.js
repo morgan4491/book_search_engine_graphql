@@ -22,10 +22,11 @@ const typeDefs = gql `
     }
 
     input BookInput {
-        googleBookId: String
+        googleBookId: ID
         authors: [String]
         description: String
         image: String
+        title: String
     }
 
     type Query {
@@ -38,7 +39,7 @@ const typeDefs = gql `
         loginUser(email: String, password: String): Response
         logoutUser: Response
         saveBook(book: BookInput): Response
-        deleteBook(googleBookId: String): Response
+        deleteBook(googleBookId: ID): Response
     }
 `;
 export default typeDefs;
